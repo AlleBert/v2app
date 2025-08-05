@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   PieChart,
   PlusCircle,
+  MinusCircle,
   List,
   Users,
   Moon,
@@ -29,7 +30,10 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "portfolio", label: "Portafoglio", icon: PieChart },
-    ...(isAdmin ? [{ id: "newInvestment", label: "Nuovo Investimento", icon: PlusCircle }] : []),
+    ...(isAdmin ? [
+      { id: "newInvestment", label: "Nuovo Investimento", icon: PlusCircle },
+      { id: "sellInvestment", label: "Vendi", icon: MinusCircle }
+    ] : []),
     { id: "history", label: "Storico", icon: List },
     { id: "participants", label: "Partecipanti", icon: Users },
   ];

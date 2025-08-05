@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { Sidebar } from "@/components/sidebar";
 import { InvestmentForm } from "@/components/investment-form";
 import { InvestmentTable } from "@/components/investment-table";
+import { SaleForm } from "@/components/sale-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -77,78 +78,78 @@ export default function Dashboard() {
       
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card data-testid="card-total-value">
+        <Card className="stats-card animate-fade-in-up" data-testid="card-total-value">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-500 dark:text-gray-400">Valore totale</p>
-                <h3 className="text-2xl font-bold mt-1" data-testid="text-total-value">
+                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Valore totale</p>
+                <h3 className="text-3xl font-bold mt-2" data-testid="text-total-value">
                   {formatCurrency(stats.totalCurrent)}
                 </h3>
               </div>
-              <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
-                <Euro className="w-5 h-5" />
+              <div className="stats-icon gradient-blue text-white">
+                <Euro className="w-6 h-6" />
               </div>
             </div>
-            <p className="text-green-500 dark:text-green-400 mt-2 flex items-center" data-testid="text-total-gain">
+            <p className="performance-positive mt-3" data-testid="text-total-gain">
               <TrendingUp className="w-4 h-4 mr-1" />
               +{stats.gainPercentage.toFixed(1)}% ({formatCurrency(stats.totalGain)})
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-alle-share">
+        <Card className="stats-card animate-fade-in-up animate-delay-100" data-testid="card-alle-share">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-500 dark:text-gray-400">Quota Alle</p>
-                <h3 className="text-2xl font-bold mt-1" data-testid="text-alle-value">
+                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Quota Alle</p>
+                <h3 className="text-3xl font-bold mt-2" data-testid="text-alle-value">
                   {formatCurrency(stats.alleTotal)}
                 </h3>
               </div>
-              <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300">
-                <User className="w-5 h-5" />
+              <div className="stats-icon gradient-purple text-white">
+                <User className="w-6 h-6" />
               </div>
             </div>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">
+            <p className="text-gray-500 dark:text-gray-400 mt-3 font-medium">
               {stats.totalCurrent > 0 ? ((stats.alleTotal / stats.totalCurrent) * 100).toFixed(1) : 0}% del totale
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-ali-share">
+        <Card className="stats-card animate-fade-in-up animate-delay-200" data-testid="card-ali-share">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-500 dark:text-gray-400">Quota Ali</p>
-                <h3 className="text-2xl font-bold mt-1" data-testid="text-ali-value">
+                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Quota Ali</p>
+                <h3 className="text-3xl font-bold mt-2" data-testid="text-ali-value">
                   {formatCurrency(stats.aliTotal)}
                 </h3>
               </div>
-              <div className="p-2 rounded-full bg-pink-100 dark:bg-pink-900 text-pink-600 dark:text-pink-300">
-                <User className="w-5 h-5" />
+              <div className="stats-icon gradient-pink text-white">
+                <User className="w-6 h-6" />
               </div>
             </div>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">
+            <p className="text-gray-500 dark:text-gray-400 mt-3 font-medium">
               {stats.totalCurrent > 0 ? ((stats.aliTotal / stats.totalCurrent) * 100).toFixed(1) : 0}% del totale
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-total-deposits">
+        <Card className="stats-card animate-fade-in-up animate-delay-300" data-testid="card-total-deposits">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-500 dark:text-gray-400">Depositi totali</p>
-                <h3 className="text-2xl font-bold mt-1" data-testid="text-total-deposits">
+                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Depositi totali</p>
+                <h3 className="text-3xl font-bold mt-2" data-testid="text-total-deposits">
                   {formatCurrency(stats.totalInitial)}
                 </h3>
               </div>
-              <div className="p-2 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300">
-                <Wallet className="w-5 h-5" />
+              <div className="stats-icon gradient-green text-white">
+                <Wallet className="w-6 h-6" />
               </div>
             </div>
-            <p className="text-green-500 dark:text-green-400 mt-2 flex items-center" data-testid="text-roi">
+            <p className="performance-positive mt-3" data-testid="text-roi">
               <TrendingUp className="w-4 h-4 mr-1" />
               +{stats.gainPercentage.toFixed(1)}% ROI
             </p>
@@ -156,33 +157,65 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Chart Placeholder */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Andamento portafoglio</CardTitle>
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm">1M</Button>
-              <Button variant="outline" size="sm">6M</Button>
-              <Button variant="default" size="sm">1Y</Button>
-              <Button variant="outline" size="sm">Tutto</Button>
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="stats-card">
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-6 flex items-center">
+              <PieChart className="w-6 h-6 mr-2 text-blue-600 dark:text-blue-400" />
+              Ripartizione Portfolio
+            </h3>
+            <div className="chart-container">
+              <div className="text-center">
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-4 flex items-center justify-center">
+                    <PieChart className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">%</span>
+                  </div>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 font-medium">Grafico interattivo in arrivo</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Visualizzazione delle quote in tempo reale</p>
+              </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
-            <p className="text-gray-500 dark:text-gray-400">Grafico performance portfolio</p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        <Card className="stats-card">
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-6 flex items-center">
+              <LineChart className="w-6 h-6 mr-2 text-green-600 dark:text-green-400" />
+              Performance nel Tempo
+            </h3>
+            <div className="chart-container">
+              <div className="text-center">
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-r from-green-500 to-blue-500 mx-auto mb-4 flex items-center justify-center">
+                    <LineChart className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full flex items-center justify-center">
+                    <TrendingUp className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 font-medium">Analisi temporale in sviluppo</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Trend e performance storiche</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Recent Investments */}
-      <Card data-testid="card-recent-investments">
+      <Card className="stats-card" data-testid="card-recent-investments">
         <CardHeader>
-          <CardTitle>Investimenti Recenti</CardTitle>
+          <CardTitle className="flex items-center">
+            <TrendingUp className="w-6 h-6 mr-2 text-blue-600 dark:text-blue-400" />
+            Investimenti Recenti
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3" data-testid="list-recent-investments">
+          <div className="space-y-4" data-testid="list-recent-investments">
             {recentInvestments.map((inv) => {
               const gain = parseFloat(inv.currentValue) - parseFloat(inv.initialValue);
               const gainPercentage = ((gain / parseFloat(inv.initialValue)) * 100);
@@ -191,29 +224,31 @@ export default function Dashboard() {
               return (
                 <div
                   key={inv.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                  className="recent-investment-card"
                   data-testid={`item-recent-investment-${inv.id}`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="investment-icon">
+                        <TrendingUp className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-lg" data-testid={`text-recent-name-${inv.id}`}>
+                          {inv.name}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400" data-testid={`text-recent-details-${inv.id}`}>
+                          {inv.symbol} • {inv.type}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium" data-testid={`text-recent-name-${inv.id}`}>
-                        {inv.name}
+                    <div className="text-right">
+                      <p className="font-bold text-xl" data-testid={`text-recent-value-${inv.id}`}>
+                        {formatCurrency(parseFloat(inv.currentValue))}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400" data-testid={`text-recent-details-${inv.id}`}>
-                        {inv.symbol} • {inv.type}
+                      <p className={`text-sm font-medium ${isPositive ? 'performance-positive' : 'performance-negative'}`} data-testid={`text-recent-performance-${inv.id}`}>
+                        {isPositive ? '+' : ''}{gainPercentage.toFixed(1)}%
                       </p>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold" data-testid={`text-recent-value-${inv.id}`}>
-                      {formatCurrency(parseFloat(inv.currentValue))}
-                    </p>
-                    <p className={`text-sm ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`} data-testid={`text-recent-performance-${inv.id}`}>
-                      {isPositive ? '+' : ''}{gainPercentage.toFixed(1)}%
-                    </p>
                   </div>
                 </div>
               );
@@ -252,6 +287,13 @@ export default function Dashboard() {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold" data-testid="text-new-investment-title">Nuovo Investimento</h2>
       <InvestmentForm onCancel={() => setActiveSection("portfolio")} />
+    </div>
+  );
+
+  const renderSellInvestment = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold" data-testid="text-sell-investment-title">Vendi Investimento</h2>
+      <SaleForm onCancel={() => setActiveSection("portfolio")} />
     </div>
   );
 
@@ -317,15 +359,15 @@ export default function Dashboard() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Alle Card */}
-        <Card data-testid="card-participant-alle">
+        <Card className="stats-card animate-fade-in-up" data-testid="card-participant-alle">
           <CardContent className="p-6">
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xl">A</span>
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-2xl">A</span>
               </div>
               <div>
-                <h3 className="text-xl font-semibold">Alle</h3>
-                <p className="text-blue-600 dark:text-blue-400">Amministratore</p>
+                <h3 className="text-2xl font-semibold">Alle</h3>
+                <p className="text-blue-600 dark:text-blue-400 font-medium">Amministratore</p>
               </div>
             </div>
             <div className="space-y-3">
@@ -358,15 +400,15 @@ export default function Dashboard() {
         </Card>
 
         {/* Ali Card */}
-        <Card data-testid="card-participant-ali">
+        <Card className="stats-card animate-fade-in-up animate-delay-100" data-testid="card-participant-ali">
           <CardContent className="p-6">
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xl">A</span>
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="w-20 h-20 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-2xl">A</span>
               </div>
               <div>
-                <h3 className="text-xl font-semibold">Ali</h3>
-                <p className="text-pink-600 dark:text-pink-400">Visualizzatore</p>
+                <h3 className="text-2xl font-semibold">Ali</h3>
+                <p className="text-pink-600 dark:text-pink-400 font-medium">Visualizzatore</p>
               </div>
             </div>
             <div className="space-y-3">
@@ -409,6 +451,8 @@ export default function Dashboard() {
         return renderPortfolio();
       case "newInvestment":
         return renderNewInvestment();
+      case "sellInvestment":
+        return renderSellInvestment();
       case "history":
         return renderHistory();
       case "participants":

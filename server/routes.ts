@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertInvestmentSchema, insertTransactionSchema } from "@shared/schema";
+import { insertInvestmentSchema, insertTransactionSchema, insertSaleSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -9,15 +9,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { username } = req.body;
+      const { username, password } = req.body;
       
       if (!username) {
         return res.status(400).json({ message: "Username è richiesto" });
       }
       
-      const user = await storage.getUserByUsername(username);
+      const user = await storage.authenticateUser(username, password);
       if (!user) {
-        return res.status(404).json({ message: "Utente non trovato" });
+        return res.status(401).json({ message: "Credenziali non valide" });
       }
       
       res.json(user);
@@ -156,6 +156,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(transactions);
     } catch (error) {
       res.status(500).json({ message: "Errore nel recupero transazioni" });
+    }
+  });
+
+  // Sales routes
+  app.get("/api/sales", async (req, res) => {
+    try {
+      const sales = await storage.getAllSales();
+      res.json(sales);
+    } catch (error) {
+      res.status(500).json({ message: "Errore nel recupero vendite" });
+    }
+  });
+
+  app.post("/api/sales", async (req, res) => {
+    try {
+      const validation = insertSaleSchema.safeParse(req.body);
+      
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Dati non validi",
+          errors: validation.error.issues 
+        });
+      }
+
+      const { allePercentage, aliPercentage, investmentId } = validation.data;
+      
+      if (allePercentage + aliPercentage !== 100) {
+        return res.status(400).json({ 
+          message: "Le percentuali devono sommare esattamente a 100%" 
+        });
+      }
+
+      // Get the investment to update
+      const investment = await storage.getInvestment(investmentId);
+      if (!investment) {
+        return res.status(404).json({ message: "Investimento non trovato" });
+      }
+
+      // Create the sale record
+      const sale = await storage.createSale(validation.data);
+      
+      // Update investment value (reduce current value by sale amount)
+      const newCurrentValue = parseFloat(investment.currentValue) - validation.data.saleAmount;
+      await storage.updateInvestment(investmentId, {
+        currentValue: newCurrentValue.toString()
+      });
+
+      // Create transaction record
+      await storage.createTransaction({
+        action: "Vendita",
+        investmentId: investmentId,
+        investmentName: investment.name,
+        amount: validation.data.saleAmount.toString(),
+        date: validation.data.saleDate,
+        userId: validation.data.createdBy
+      });
+      
+      res.status(201).json(sale);
+    } catch (error) {
+      res.status(500).json({ message: "Errore nella creazione vendita" });
     }
   });
 

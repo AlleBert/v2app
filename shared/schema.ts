@@ -8,6 +8,20 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   displayName: text("display_name").notNull(),
   role: text("role").notNull(), // 'admin' or 'viewer'
+  password: text("password"), // only required for admin users
+});
+
+export const sales = pgTable("sales", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  investmentId: text("investment_id").notNull(),
+  investmentName: text("investment_name").notNull(),
+  saleAmount: decimal("sale_amount", { precision: 10, scale: 2 }).notNull(),
+  salePrice: decimal("sale_price", { precision: 10, scale: 2 }).notNull(),
+  allePercentage: integer("alle_percentage").notNull(),
+  aliPercentage: integer("ali_percentage").notNull(),
+  saleDate: text("sale_date").notNull(),
+  createdBy: text("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const investments = pgTable("investments", {
@@ -54,9 +68,21 @@ export const insertTransactionSchema = createInsertSchema(transactions).omit({
   createdAt: true,
 });
 
+export const insertSaleSchema = createInsertSchema(sales).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  allePercentage: z.number().min(0).max(100),
+  aliPercentage: z.number().min(0).max(100),
+  saleAmount: z.number().positive(),
+  salePrice: z.number().positive(),
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Investment = typeof investments.$inferSelect;
 export type InsertInvestment = z.infer<typeof insertInvestmentSchema>;
 export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
+export type Sale = typeof sales.$inferSelect;
+export type InsertSale = z.infer<typeof insertSaleSchema>;
