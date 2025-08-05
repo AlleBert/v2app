@@ -18,6 +18,8 @@ import {
   PlusCircle,
   MinusCircle,
   Bell,
+  PieChart,
+  LineChart,
 } from "lucide-react";
 
 export default function Dashboard() {
