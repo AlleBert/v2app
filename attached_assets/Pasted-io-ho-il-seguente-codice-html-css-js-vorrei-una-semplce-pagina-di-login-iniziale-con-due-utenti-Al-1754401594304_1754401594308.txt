@@ -1,0 +1,633 @@
+io ho il seguente codice html,css,js., vorrei una semplce pagina di login iniziale con due utenti Alle (admin)e Ali (viwer) Ali ha accesso libero ma non ha modifica, alle invece puo inserire operazioni. no autenticazioni complesse con servizi esterni...vorrei la validazione del tipo di investimento che inserisco (ETF…) cosi da avere un monitoraggio delle prestazioni.
+questo è il risultato che io voglio ottenere graficamente, tuttavia voglio sviluppare questa webapp in modo che sia effettivamente utilizzabile da me e mia sorella. voglio farlo in una maniera tecnologicamente funzionale ma senza troppe complessità. Decidi tu che tecnologie utilizzare come credi che sia meglio fare. di seguito il codice del mockup iniziale:
+
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investimenti Condivisi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar {
+            transition: all 0.3s;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar fixed md:relative z-20 w-64 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+            <div class="p-4 flex items-center justify-between">
+                <h1 class="text-xl font-bold">Investimenti Condivisi</h1>
+                <button id="closeSidebar" class="md:hidden">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                        <span>M</span>
+                    </div>
+                    <div>
+                        <p class="font-medium">Marco</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Admin</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400">
+                            <i data-lucide="layout-dashboard"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i data-lucide="pie-chart"></i>
+                            <span>Portafoglio</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i data-lucide="plus-circle"></i>
+                            <span>Nuovo Investimento</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i data-lucide="list"></i>
+                            <span>Storico</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i data-lucide="users"></i>
+                            <span>Partecipanti</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i data-lucide="settings"></i>
+                            <span>Impostazioni</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700">
+                <button id="toggleTheme" class="flex items-center space-x-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i data-lucide="moon"></i>
+                    <span>Modalità Scura</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <div class="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
+                <button id="openSidebar" class="md:hidden">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <i data-lucide="bell" class="text-gray-500"></i>
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <i data-lucide="user"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <!-- Dashboard Overview -->
+                <section id="dashboard" class="mb-8">
+                    <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 dark:text-gray-400">Valore totale</p>
+                                    <h3 class="text-2xl font-bold mt-1">€24,589.34</h3>
+                                </div>
+                                <div class="p-2 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
+                                    <i data-lucide="euro"></i>
+                                </div>
+                            </div>
+                            <p class="text-green-500 dark:text-green-400 mt-2 flex items-center">
+                                <i data-lucide="trending-up" class="mr-1"></i>
+                                +12.5% (€2,734.21)
+                            </p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 dark:text-gray-400">Tua quota</p>
+                                    <h3 class="text-2xl font-bold mt-1">€18,442.01</h3>
+                                </div>
+                                <div class="p-2 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300">
+                                    <i data-lucide="user"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-500 dark:text-gray-400 mt-2">75% del totale</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 dark:text-gray-400">Quota sorella</p>
+                                    <h3 class="text-2xl font-bold mt-1">€6,147.33</h3>
+                                </div>
+                                <div class="p-2 rounded-full bg-pink-100 dark:bg-pink-900 text-pink-600 dark:text-pink-300">
+                                    <i data-lucide="user"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-500 dark:text-gray-400 mt-2">25% del totale</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 dark:text-gray-400">Depositi totali</p>
+                                    <h3 class="text-2xl font-bold mt-1">€20,000.00</h3>
+                                </div>
+                                <div class="p-2 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300">
+                                    <i data-lucide="wallet"></i>
+                                </div>
+                            </div>
+                            <p class="text-green-500 dark:text-green-400 mt-2 flex items-center">
+                                <i data-lucide="trending-up" class="mr-1"></i>
+                                +22.9% ROI
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700 mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold">Andamento portafoglio</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-700">1M</button>
+                                <button class="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-700">6M</button>
+                                <button class="px-3 py-1 text-sm rounded-md bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">1Y</button>
+                                <button class="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-700">Tutto</button>
+                            </div>
+                        </div>
+                        <div class="h-64 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
+                            <p class="text-gray-500 dark:text-gray-400">Grafico placeholder</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Investimenti Attivi -->
+                <section id="investimenti" class="mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Investimenti Attivi</h2>
+                        <button class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                            <i data-lucide="plus"></i>
+                            <span>Aggiungi</span>
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asset</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantità</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Prezzo medio</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Prezzo attuale</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Valore</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">G/L</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quota sorella</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300">
+                                                    <i data-lucide="dollar-sign"></i>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium">VWCE</div>
+                                                    <div class="text-sm text-gray-500 dark:text-gray-400">ETF</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">85.25</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€92.34</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="text" value="€108.72" class="w-20 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€9,268.38</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-500 dark:text-green-400">+17.7%</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€2,317.10 (25%)</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mr-2">
+                                                <i data-lucide="edit"></i>
+                                            </button>
+                                            <button class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center text-green-600 dark:text-green-300">
+                                                    <i data-lucide="bitcoin"></i>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium">Bitcoin</div>
+                                                    <div class="text-sm text-gray-500 dark:text-gray-400">Crypto</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">0.42</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€28,450.00</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="text" value="€35,200.00" class="w-20 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€14,784.00</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-500 dark:text-green-400">+23.7%</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€3,696.00 (25%)</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mr-2">
+                                                <i data-lucide="edit"></i>
+                                            </button>
+                                            <button class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center text-yellow-600 dark:text-yellow-300">
+                                                    <i data-lucide="building-2"></i>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium">Apple</div>
+                                                    <div class="text-sm text-gray-500 dark:text-gray-400">Azione</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">12</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€135.20</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="text" value="€147.85" class="w-20 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€1,774.20</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-500 dark:text-green-400">+9.4%</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€443.55 (25%)</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mr-2">
+                                                <i data-lucide="edit"></i>
+                                            </button>
+                                            <button class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Nuovo Investimento -->
+                <section id="nuovo-investimento" class="mb-8">
+                    <h2 class="text-2xl font-bold mb-6">Aggiungi Nuovo Investimento</h2>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                        <form>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Nome Asset</label>
+                                    <input type="text" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Categoria</label>
+                                    <select class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2">
+                                        <option>ETF</option>
+                                        <option>Azione</option>
+                                        <option>Crypto</option>
+                                        <option>Altro</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Data Acquisto</label>
+                                    <input type="date" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Quantità</label>
+                                    <input type="number" step="0.00000001" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Prezzo Unitario (€)</label>
+                                    <input type="number" step="0.01" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Quota Sorella (%)</label>
+                                    <input type="number" value="25" min="0" max="100" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium mb-1">Note</label>
+                                    <textarea rows="3" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-6 flex justify-end space-x-3">
+                                <button type="button" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium">Annulla</button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium">Salva Investimento</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Storico Movimenti -->
+                <section id="storico">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Storico Movimenti</h2>
+                        <div class="flex space-x-2">
+                            <select class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 text-sm">
+                                <option>Tutti i tipi</option>
+                                <option>Acquisto</option>
+                                <option>Vendita</option>
+                                <option>Deposito</option>
+                            </select>
+                            <select class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 text-sm">
+                                <option>Tutti i mesi</option>
+                                <option>Gennaio 2023</option>
+                                <option>Febbraio 2023</option>
+                                <option>Marzo 2023</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tipo</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asset</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantità</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Importo (€)</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Note</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">15/03/2023</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                                Acquisto
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">VWCE</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">5.25</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€570.78</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">PAC mensile</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">01/03/2023</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                                Deposito
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">-</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">-</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€1,000.00</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">Deposito sorella</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">25/02/2023</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                                Acquisto
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">Apple</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">2</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€270.40</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">Aumento posizione</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">15/02/2023</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                                Acquisto
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">VWCE</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">5.0</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€543.60</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">PAC mensile</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">10/02/2023</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
+                                                Vendita
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">Tesla</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">1</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">€187.50</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">Take profit</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
+                            <div class="flex-1 flex justify-between sm:hidden">
+                                <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800">Indietro</a>
+                                <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800">Avanti</a>
+                            </div>
+                            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                                        Mostrando <span class="font-medium">1</span> a <span class="font-medium">5</span> di <span class="font-medium">24</span> movimenti
+                                    </p>
+                                </div>
+                                <div>
+                                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <span class="sr-only">Precedente</span>
+                                            <i data-lucide="chevron-left" class="h-4 w-4"></i>
+                                        </a>
+                                        <a href="#" aria-current="page" class="z-10 bg-blue-50 dark:bg-blue-900 border-blue-500 dark:border-blue-700 text-blue-600 dark:text-blue-300 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                            1
+                                        </a>
+                                        <a href="#" class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                            2
+                                        </a>
+                                        <a href="#" class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                            3
+                                        </a>
+                                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <span class="sr-only">Successivo</span>
+                                            <i data-lucide="chevron-right" class="h-4 w-4"></i>
+                                        </a>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inizializza le icone Lucide
+        lucide.createIcons();
+        
+        // Toggle sidebar mobile
+        const openSidebar = document.getElementById('openSidebar');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebar = document.querySelector('.sidebar');
+        
+        openSidebar.addEventListener('click', () => {
+            sidebar.classList.add('open');
+        });
+        
+        closeSidebar.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+        });
+        
+        // Toggle tema chiaro/scuro
+        const toggleTheme = document.getElementById('toggleTheme');
+        const html = document.documentElement;
+        const themeIcon = toggleTheme.querySelector('i');
+        
+        toggleTheme.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            
+            if (html.classList.contains('dark')) {
+                themeIcon.setAttribute('data-lucide', 'sun');
+                toggleTheme.querySelector('span').textContent = 'Modalità Chiara';
+            } else {
+                themeIcon.setAttribute('data-lucide', 'moon');
+                toggleTheme.querySelector('span').textContent = 'Modalità Scura';
+            }
+            
+            lucide.createIcons();
+        });
+        
+        // Simulazione dati
+        const investments = [
+            {
+                id: 1,
+                name: 'VWCE',
+                type: 'ETF',
+                quantity: 85.25,
+                avgPrice: 92.34,
+                currentPrice: 108.72,
+                sisterShare: 25,
+                notes: 'PAC mensile'
+            },
+            {
+                id: 2,
+                name: 'Bitcoin',
+                type: 'Crypto',
+                quantity: 0.42,
+                avgPrice: 28450,
+                currentPrice: 35200,
+                sisterShare: 25,
+                notes: 'Hold a lungo termine'
+            },
+            {
+                id: 3,
+                name: 'Apple',
+                type: 'Azione',
+                quantity: 12,
+                avgPrice: 135.20,
+                currentPrice: 147.85,
+                sisterShare: 25,
+                notes: 'Dividend stock'
+            }
+        ];
+        
+        const transactions = [
+            {
+                date: '2023-03-15',
+                type: 'buy',
+                asset: 'VWCE',
+                quantity: 5.25,
+                amount: 570.78,
+                notes: 'PAC mensile'
+            },
+            {
+                date: '2023-03-01',
+                type: 'deposit',
+                asset: null,
+                quantity: null,
+                amount: 1000,
+                notes: 'Deposito sorella'
+            },
+            {
+                date: '2023-02-25',
+                type: 'buy',
+                asset: 'Apple',
+                quantity: 2,
+                amount: 270.40,
+                notes: 'Aumento posizione'
+            },
+            {
+                date: '2023-02-15',
+                type: 'buy',
+                asset: 'VWCE',
+                quantity: 5.0,
+                amount: 543.60,
+                notes: 'PAC mensile'
+            },
+            {
+                date: '2023-02-10',
+                type: 'sell',
+                asset: 'Tesla',
+                quantity: 1,
+                amount: 187.50,
+                notes: 'Take profit'
+            }
+        ];
+        
+        // Funzioni per aggiornare i dati nella UI
+        function updateCurrentPrice(id, newPrice) {
+            const investment = investments.find(inv => inv.id === id);
+            if (investment) {
+                investment.currentPrice = parseFloat(newPrice.replace('€', ''));
+            }
+        }
+        
+        // Aggiungi event listeners per l'aggiornamento dei prezzi
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const row = e.target.closest('tr');
+                const id = parseInt(row.dataset.id);
+                updateCurrentPrice(id, e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>
