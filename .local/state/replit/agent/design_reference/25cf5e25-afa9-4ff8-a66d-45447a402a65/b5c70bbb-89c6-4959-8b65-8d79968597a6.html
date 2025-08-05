@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investimenti Condivisi - Marco & Sara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        .user-card {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .user-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .dark .user-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+        .investment-input {
+            transition: border-color 0.2s ease-in-out;
+        }
+        .investment-input:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-inter">
+    
+    <!-- User Selection Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+        <div class="max-w-md w-full mx-4">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="flex justify-center mb-4">
+                    <div class="w-16 h-16 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center">
+                        <i data-lucide="trending-up" class="w-8 h-8 text-white"></i>
+                    </div>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Investimenti Condivisi</h1>
+                <p class="text-gray-600 dark:text-gray-300">Seleziona il tuo profilo per accedere</p>
+            </div>
+
+            <!-- User Cards -->
+            <div class="space-y-4 mb-8">
+                <!-- Alle (Admin) Card -->
+                <div class="user-card bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-400" 
+                     onclick="loginUser('alle', 'admin')">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">A</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Alle</h3>
+                            <p class="text-blue-600 dark:text-blue-400 font-medium">Amministratore</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Accesso completo • Gestione investimenti</p>
+                        </div>
+                        <div class="text-blue-500 dark:text-blue-400">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ali (Viewer) Card -->
+                <div class="user-card bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-transparent hover:border-pink-500 dark:hover:border-pink-400"
+                     onclick="loginUser('ali', 'viewer')">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">A</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Ali</h3>
+                            <p class="text-pink-600 dark:text-pink-400 font-medium">Visualizzatore</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Solo lettura • Monitoraggio portfolio</p>
+                        </div>
+                        <div class="text-pink-500 dark:text-pink-400">
+                            <i data-lucide="eye" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Toggle -->
+            <div class="flex justify-center">
+                <button id="themeToggleLogin" class="flex items-center space-x-2 px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <i data-lucide="moon" class="w-4 h-4"></i>
+                    <span class="text-sm">Cambia tema</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="hidden">
+        <div class="flex h-screen overflow-hidden">
+            <!-- Sidebar -->
+            <div class="sidebar fixed md:relative z-20 w-64 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+                <div class="p-4 flex items-center justify-between">
+                    <h1 class="text-xl font-bold">Investimenti Condivisi</h1>
+                    <button id="closeSidebar" class="md:hidden">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                
+                <!-- User Profile -->
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center space-x-3">
+                        <div id="userAvatar" class="w-10 h-10 rounded-full flex items-center justify-center text-white">
+                            <span id="userInitial">A</span>
+                        </div>
+                        <div>
+                            <p id="userName" class="font-medium">Alle</p>
+                            <p id="userRole" class="text-sm text-gray-500 dark:text-gray-400">Amministratore</p>
+                        </div>
+                    </div>
+                    <button onclick="logout()" class="mt-3 w-full text-left text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300">
+                        <i data-lucide="log-out" class="w-4 h-4 inline mr-2"></i>
+                        Esci
+                    </button>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="p-4">
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" onclick="showSection('dashboard')" class="nav-link flex items-center space-x-3 p-2 rounded-lg bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400">
+                                <i data-lucide="layout-dashboard"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="showSection('portfolio')" class="nav-link flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i data-lucide="pie-chart"></i>
+                                <span>Portafoglio</span>
+                            </a>
+                        </li>
+                        <li id="newInvestmentNav">
+                            <a href="#" onclick="showSection('newInvestment')" class="nav-link flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i data-lucide="plus-circle"></i>
+                                <span>Nuovo Investimento</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="showSection('history')" class="nav-link flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i data-lucide="list"></i>
+                                <span>Storico</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="showSection('participants')" class="nav-link flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i data-lucide="users"></i>
+                                <span>Partecipanti</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <!-- Theme Toggle -->
+                <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700">
+                    <button id="toggleTheme" class="flex items-center space-x-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i data-lucide="moon"></i>
+                        <span>Modalità Scura</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 overflow-auto">
+                <!-- Header -->
+                <div class="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
+                    <button id="openSidebar" class="md:hidden">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <i data-lucide="bell" class="text-gray-500"></i>
+                            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                            <i data-lucide="user"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <!-- Dashboard Section -->
+                    <section id="dashboard" class="content-section">
+                        <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
+                        
+                        <!-- Stats Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-500 dark:text-gray-400">Valore totale</p>
+                                        <h3 id="totalValue" class="text-2xl font-bold mt-1">€24,589.34</h3>
+                                    </div>
+                                    <div class="p-2 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
+                                        <i data-lucide="euro"></i>
+                                    </div>
+                                </div>
+                                <p class="text-green-500 dark:text-green-400 mt-2 flex items-center">
+                                    <i data-lucide="trending-up" class="mr-1"></i>
+                                    <span id="totalGain">+12.5% (€2,734.21)</span>
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-500 dark:text-gray-400">Quota Alle</p>
+                                        <h3 id="alleShare" class="text-2xl font-bold mt-1">€18,442.01</h3>
+                                    </div>
+                                    <div class="p-2 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300">
+                                        <i data-lucide="user"></i>
+                                    </div>
+                                </div>
+                                <p class="text-gray-500 dark:text-gray-400 mt-2">75% del totale</p>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-500 dark:text-gray-400">Quota Ali</p>
+                                        <h3 id="aliShare" class="text-2xl font-bold mt-1">€6,147.33</h3>
+                                    </div>
+                                    <div class="p-2 rounded-full bg-pink-100 dark:bg-pink-900 text-pink-600 dark:text-pink-300">
+                                        <i data-lucide="user"></i>
+                                    </div>
+                                </div>
+                                <p class="text-gray-500 dark:text-gray-400 mt-2">25% del totale</p>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-500 dark:text-gray-400">Depositi totali</p>
+                                        <h3 id="totalDeposits" class="text-2xl font-bold mt-1">€20,000.00</h3>
+                                    </div>
+                                    <div class="p-2 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300">
+                                        <i data-lucide="wallet"></i>
+                                    </div>
+                                </div>
+                                <p class="text-green-500 dark:text-green-400 mt-2 flex items-center">
+                                    <i data-lucide="trending-up" class="mr-1"></i>
+                                    <span id="roiPercentage">+22.9% ROI</span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Chart Placeholder -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700 mb-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold">Andamento portafoglio</h3>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-700">1M</button>
+                                    <button class="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-700">6M</button>
+                                    <button class="px-3 py-1 text-sm rounded-md bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">1Y</button>
+                                    <button class="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-700">Tutto</button>
+                                </div>
+                            </div>
+                            <div class="h-64 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
+                                <p class="text-gray-500 dark:text-gray-400">Grafico performance portfolio</p>
+                            </div>
+                        </div>
+
+                        <!-- Recent Investments -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                            <h3 class="font-bold mb-4">Investimenti Recenti</h3>
+                            <div id="recentInvestmentsList" class="space-y-3">
+                                <!-- Recent investments will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Portfolio Section -->
+                    <section id="portfolio" class="content-section hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold">Portafoglio Investimenti</h2>
+                            <button id="addInvestmentBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                <i data-lucide="plus"></i>
+                                <span>Aggiungi</span>
+                            </button>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead class="bg-gray-50 dark:bg-gray-700">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Investimento</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tipo</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Valore Iniziale</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Valore Attuale</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Performance</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Alle %</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ali %</th>
+                                            <th id="actionsHeader" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Azioni</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="investmentTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                        <!-- Investment rows will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- New Investment Section -->
+                    <section id="newInvestment" class="content-section hidden">
+                        <h2 class="text-2xl font-bold mb-6">Nuovo Investimento</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                            <form id="investmentForm" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome Investimento</label>
+                                        <input type="text" id="investmentName" required class="investment-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo di Investimento</label>
+                                        <select id="investmentType" required class="investment-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                            <option value="">Seleziona tipo</option>
+                                            <option value="ETF">ETF</option>
+                                            <option value="Azioni">Azioni</option>
+                                            <option value="Obbligazioni">Obbligazioni</option>
+                                            <option value="Fondi">Fondi Comuni</option>
+                                            <option value="Crypto">Criptovalute</option>
+                                            <option value="Altro">Altro</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Simbolo/Ticker</label>
+                                        <input type="text" id="investmentSymbol" placeholder="es. VWCE, AAPL" class="investment-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Importo Iniziale (€)</label>
+                                        <input type="number" id="investmentAmount" required min="0" step="0.01" class="investment-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Valore Attuale (€)</label>
+                                        <input type="number" id="currentValue" required min="0" step="0.01" class="investment-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data Acquisto</label>
+                                        <input type="date" id="purchaseDate" required class="investment-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    </div>
+                                </div>
+                                
+                                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                                    <h3 class="text-lg font-medium mb-4">Ripartizione Quote</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quota Alle (%)</label>
+                                            <input type="number" id="allePercentage" required min="0" max="100" value="75" class="investment-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quota Ali (%)</label>
+                                            <input type="number" id="aliPercentage" required min="0" max="100" value="25" class="investment-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Le percentuali devono sommare a 100%</p>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-4">
+                                    <button type="button" onclick="showSection('portfolio')" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        Annulla
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+                                        Aggiungi Investimento
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                    <!-- History Section -->
+                    <section id="history" class="content-section hidden">
+                        <h2 class="text-2xl font-bold mb-6">Storico Operazioni</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                                    <div class="flex space-x-4">
+                                        <select class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                            <option>Tutti i tipi</option>
+                                            <option>ETF</option>
+                                            <option>Azioni</option>
+                                            <option>Obbligazioni</option>
+                                        </select>
+                                        <select class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                            <option>Ultimi 30 giorni</option>
+                                            <option>Ultimi 3 mesi</option>
+                                            <option>Ultimo anno</option>
+                                            <option>Tutto</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="historyList" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <!-- History items will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Participants Section -->
+                    <section id="participants" class="content-section hidden">
+                        <h2 class="text-2xl font-bold mb-6">Partecipanti</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Alle Card -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center space-x-4 mb-4">
+                                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                        <span class="text-white font-bold text-xl">A</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-semibold">Alle</h3>
+                                        <p class="text-blue-600 dark:text-blue-400">Amministratore</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Quota totale:</span>
+                                        <span class="font-semibold">75%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Valore:</span>
+                                        <span class="font-semibold">€18,442.01</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Depositi:</span>
+                                        <span class="font-semibold">€15,000.00</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Guadagno:</span>
+                                        <span class="font-semibold text-green-600 dark:text-green-400">+€3,442.01</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ali Card -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center space-x-4 mb-4">
+                                    <div class="w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full flex items-center justify-center">
+                                        <span class="text-white font-bold text-xl">A</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-semibold">Ali</h3>
+                                        <p class="text-pink-600 dark:text-pink-400">Visualizzatore</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Quota totale:</span>
+                                        <span class="font-semibold">25%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Valore:</span>
+                                        <span class="font-semibold">€6,147.33</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Depositi:</span>
+                                        <span class="font-semibold">€5,000.00</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Guadagno:</span>
+                                        <span class="font-semibold text-green-600 dark:text-green-400">+€1,147.33</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let currentUser = null;
+        let userRole = null;
+        let investments = [
+            {
+                id: 1,
+                name: 'Vanguard FTSE All-World',
+                symbol: 'VWCE',
+                type: 'ETF',
+                initialValue: 8000,
+                currentValue: 9200,
+                allePercentage: 75,
+                aliPercentage: 25,
+                purchaseDate: '2023-06-15'
+            },
+            {
+                id: 2,
+                name: 'Apple Inc.',
+                symbol: 'AAPL',
+                type: 'Azioni',
+                initialValue: 5000,
+                currentValue: 5800,
+                allePercentage: 80,
+                aliPercentage: 20,
+                purchaseDate: '2023-08-20'
+            },
+            {
+                id: 3,
+                name: 'iShares Core MSCI World',
+                symbol: 'IWDA',
+                type: 'ETF',
+                initialValue: 7000,
+                currentValue: 7589.34,
+                allePercentage: 70,
+                aliPercentage: 30,
+                purchaseDate: '2023-09-10'
+            }
+        ];
+        
+        let history = [
+            { id: 1, action: 'Acquisto', investment: 'VWCE', amount: 8000, date: '2023-06-15', user: 'Alle' },
+            { id: 2, action: 'Acquisto', investment: 'AAPL', amount: 5000, date: '2023-08-20', user: 'Alle' },
+            { id: 3, action: 'Acquisto', investment: 'IWDA', amount: 7000, date: '2023-09-10', user: 'Alle' }
+        ];
+
+        // Initialize Lucide icons
+        function initializeLucide() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        // Theme Management
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            updateThemeIcons();
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcons();
+        }
+
+        function updateThemeIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const themeButtons = document.querySelectorAll('#toggleTheme, #themeToggleLogin');
+            themeButtons.forEach(button => {
+                const icon = button.querySelector('i');
+                const span = button.querySelector('span');
+                if (isDark) {
+                    icon.setAttribute('data-lucide', 'sun');
+                    if (span) span.textContent = 'Modalità Chiara';
+                } else {
+                    icon.setAttribute('data-lucide', 'moon');
+                    if (span) span.textContent = 'Modalità Scura';
+                }
+            });
+            initializeLucide();
+        }
+
+        // User Authentication
+        function loginUser(username, role) {
+            currentUser = username;
+            userRole = role;
+            
+            // Update UI based on user role
+            updateUIForUser();
+            
+            // Show main app, hide login
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            // Show dashboard by default
+            showSection('dashboard');
+            
+            // Initialize data
+            updateDashboard();
+            populateInvestmentTable();
+            populateHistory();
+            updateRecentInvestments();
+            
+            initializeLucide();
+        }
+
+        function logout() {
+            currentUser = null;
+            userRole = null;
+            
+            // Show login screen, hide main app
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            
+            initializeLucide();
+        }
+
+        function updateUIForUser() {
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            const userRole = document.getElementById('userRole');
+            const userInitial = document.getElementById('userInitial');
+            
+            if (currentUser === 'alle') {
+                userAvatar.className = 'w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white';
+                userName.textContent = 'Alle';
+                userRole.textContent = 'Amministratore';
+                userInitial.textContent = 'A';
+            } else {
+                userAvatar.className = 'w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 flex items-center justify-center text-white';
+                userName.textContent = 'Ali';
+                userRole.textContent = 'Visualizzatore';
+                userInitial.textContent = 'A';
+            }
+            
+            // Hide/show admin-only elements
+            const adminElements = document.querySelectorAll('#newInvestmentNav, #addInvestmentBtn, #actionsHeader');
+            adminElements.forEach(element => {
+                if (userRole === 'viewer') {
+                    element.style.display = 'none';
+                } else {
+                    element.style.display = '';
+                }
+            });
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show target section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('bg-blue-50', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400');
+                link.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+            });
+            
+            // Highlight active nav item
+            const activeNav = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (activeNav) {
+                activeNav.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+                activeNav.classList.add('bg-blue-50', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400');
+            }
+        }
+
+        // Dashboard Updates
+        function updateDashboard() {
+            const totalValue = investments.reduce((sum, inv) => sum + inv.currentValue, 0);
+            const totalInitial = investments.reduce((sum, inv) => sum + inv.initialValue, 0);
+            const totalGain = totalValue - totalInitial;
+            const gainPercentage = ((totalGain / totalInitial) * 100).toFixed(1);
+            
+            const alleTotal = investments.reduce((sum, inv) => sum + (inv.currentValue * inv.allePercentage / 100), 0);
+            const aliTotal = investments.reduce((sum, inv) => sum + (inv.currentValue * inv.aliPercentage / 100), 0);
+            
+            document.getElementById('totalValue').textContent = `€${totalValue.toLocaleString('it-IT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('totalGain').textContent = `+${gainPercentage}% (€${totalGain.toLocaleString('it-IT', { minimumFractionDigits: 2 })})`;
+            document.getElementById('alleShare').textContent = `€${alleTotal.toLocaleString('it-IT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('aliShare').textContent = `€${aliTotal.toLocaleString('it-IT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('totalDeposits').textContent = `€${totalInitial.toLocaleString('it-IT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('roiPercentage').textContent = `+${gainPercentage}% ROI`;
+        }
+
+        function updateRecentInvestments() {
+            const recentList = document.getElementById('recentInvestmentsList');
+            const recentInvestments = investments.slice(-3);
+            
+            recentList.innerHTML = recentInvestments.map(inv => {
+                const gain = inv.currentValue - inv.initialValue;
+                const gainPercentage = ((gain / inv.initialValue) * 100).toFixed(1);
+                const isPositive = gain >= 0;
+                
+                return `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                <i data-lucide="trending-up" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">${inv.name}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">${inv.symbol} • ${inv.type}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold">€${inv.currentValue.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</p>
+                            <p class="text-sm ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
+                                ${isPositive ? '+' : ''}${gainPercentage}%
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            initializeLucide();
+        }
+
+        // Investment Table
+        function populateInvestmentTable() {
+            const tableBody = document.getElementById('investmentTableBody');
+            
+            tableBody.innerHTML = investments.map(inv => {
+                const gain = inv.currentValue - inv.initialValue;
+                const gainPercentage = ((gain / inv.initialValue) * 100).toFixed(1);
+                const isPositive = gain >= 0;
+                
+                const actionsCell = userRole === 'viewer' ? '' : `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <button onclick="editInvestment(${inv.id})" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">
+                            <i data-lucide="edit-2" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteInvestment(${inv.id})" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                
+                return `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">${inv.name}</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">${inv.symbol}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                ${inv.type}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            €${inv.initialValue.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            €${inv.currentValue.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <div class="${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
+                                ${isPositive ? '+' : ''}€${Math.abs(gain).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                                <div class="text-xs">(${isPositive ? '+' : ''}${gainPercentage}%)</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            ${inv.allePercentage}%
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            ${inv.aliPercentage}%
+                        </td>
+                        ${actionsCell}
+                    </tr>
+                `;
+            }).join('');
+            
+            initializeLucide();
+        }
+
+        // Investment Form
+        function setupInvestmentForm() {
+            const form = document.getElementById('investmentForm');
+            const allePercentage = document.getElementById('allePercentage');
+            const aliPercentage = document.getElementById('aliPercentage');
+            
+            // Auto-calculate percentages
+            allePercentage.addEventListener('input', function() {
+                const value = parseFloat(this.value) || 0;
+                aliPercentage.value = Math.max(0, 100 - value);
+            });
+            
+            aliPercentage.addEventListener('input', function() {
+                const value = parseFloat(this.value) || 0;
+                allePercentage.value = Math.max(0, 100 - value);
+            });
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validation
+                const allePercent = parseFloat(allePercentage.value);
+                const aliPercent = parseFloat(aliPercentage.value);
+                
+                if (allePercent + aliPercent !== 100) {
+                    alert('Le percentuali devono sommare esattamente a 100%');
+                    return;
+                }
+                
+                // Create new investment
+                const newInvestment = {
+                    id: Date.now(),
+                    name: document.getElementById('investmentName').value,
+                    symbol: document.getElementById('investmentSymbol').value,
+                    type: document.getElementById('investmentType').value,
+                    initialValue: parseFloat(document.getElementById('investmentAmount').value),
+                    currentValue: parseFloat(document.getElementById('currentValue').value),
+                    allePercentage: allePercent,
+                    aliPercentage: aliPercent,
+                    purchaseDate: document.getElementById('purchaseDate').value
+                };
+                
+                // Add to investments array
+                investments.push(newInvestment);
+                
+                // Add to history
+                history.push({
+                    id: Date.now(),
+                    action: 'Acquisto',
+                    investment: newInvestment.symbol,
+                    amount: newInvestment.initialValue,
+                    date: newInvestment.purchaseDate,
+                    user: currentUser === 'alle' ? 'Alle' : 'Ali'
+                });
+                
+                // Reset form
+                form.reset();
+                allePercentage.value = 75;
+                aliPercentage.value = 25;
+                
+                // Update UI
+                updateDashboard();
+                populateInvestmentTable();
+                populateHistory();
+                updateRecentInvestments();
+                
+                // Show portfolio section
+                showSection('portfolio');
+                
+                alert('Investimento aggiunto con successo!');
+            });
+        }
+
+        function editInvestment(id) {
+            // TODO: Implement edit functionality
+            alert('Funzione di modifica in sviluppo');
+        }
+
+        function deleteInvestment(id) {
+            if (confirm('Sei sicuro di voler eliminare questo investimento?')) {
+                investments = investments.filter(inv => inv.id !== id);
+                updateDashboard();
+                populateInvestmentTable();
+                updateRecentInvestments();
+                
+                // Add to history
+                history.push({
+                    id: Date.now(),
+                    action: 'Eliminazione',
+                    investment: 'Investimento eliminato',
+                    amount: 0,
+                    date: new Date().toISOString().split('T')[0],
+                    user: currentUser === 'alle' ? 'Alle' : 'Ali'
+                });
+                populateHistory();
+            }
+        }
+
+        // History
+        function populateHistory() {
+            const historyList = document.getElementById('historyList');
+            
+            // Sort history by date (newest first)
+            const sortedHistory = [...history].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            historyList.innerHTML = sortedHistory.map(item => {
+                const actionColor = item.action === 'Acquisto' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+                const actionIcon = item.action === 'Acquisto' ? 'plus-circle' : 'minus-circle';
+                
+                return `
+                    <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                    <i data-lucide="${actionIcon}" class="w-4 h-4 ${actionColor}"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">${item.action} ${item.investment}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Da ${item.user} • ${new Date(item.date).toLocaleDateString('it-IT')}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold ${actionColor}">
+                                    ${item.action === 'Acquisto' ? '+' : ''}€${item.amount.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            initializeLucide();
+        }
+
+        // Mobile Sidebar
+        function setupMobileSidebar() {
+            const openButton = document.getElementById('openSidebar');
+            const closeButton = document.getElementById('closeSidebar');
+            const sidebar = document.querySelector('.sidebar');
+            
+            openButton.addEventListener('click', () => {
+                sidebar.classList.add('open');
+            });
+            
+            closeButton.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+            });
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth < 768 && 
+                    !sidebar.contains(e.target) && 
+                    !openButton.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme
+            initializeTheme();
+            
+            // Setup theme toggles
+            document.getElementById('toggleTheme').addEventListener('click', toggleTheme);
+            document.getElementById('themeToggleLogin').addEventListener('click', toggleTheme);
+            
+            // Setup mobile sidebar
+            setupMobileSidebar();
+            
+            // Setup investment form
+            setupInvestmentForm();
+            
+            // Add investment button
+            document.getElementById('addInvestmentBtn').addEventListener('click', () => {
+                showSection('newInvestment');
+            });
+            
+            // Initialize icons
+            initializeLucide();
+        });
+    </script>
+</body>
+</html>
