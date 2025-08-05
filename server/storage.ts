@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Investment, type InsertInvestment, type Transaction, type InsertTransaction } from "@shared/schema";
+import { type User, type InsertUser, type Investment, type InsertInvestment, type Transaction, type InsertTransaction, type Sale, type InsertSale } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -7,6 +7,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getAllUsers(): Promise<User[]>;
+  authenticateUser(username: string, password?: string): Promise<User | null>;
   
   // Investments
   getInvestment(id: string): Promise<Investment | undefined>;
@@ -19,17 +20,24 @@ export interface IStorage {
   getTransaction(id: string): Promise<Transaction | undefined>;
   getAllTransactions(): Promise<Transaction[]>;
   createTransaction(transaction: InsertTransaction): Promise<Transaction>;
+  
+  // Sales
+  getSale(id: string): Promise<Sale | undefined>;
+  getAllSales(): Promise<Sale[]>;
+  createSale(sale: InsertSale): Promise<Sale>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private investments: Map<string, Investment>;
   private transactions: Map<string, Transaction>;
+  private sales: Map<string, Sale>;
 
   constructor() {
     this.users = new Map();
     this.investments = new Map();
     this.transactions = new Map();
+    this.sales = new Map();
     
     // Initialize default users
     this.initializeDefaultData();
@@ -40,13 +48,15 @@ export class MemStorage implements IStorage {
     await this.createUser({
       username: "alle",
       displayName: "Alle",
-      role: "admin"
+      role: "admin",
+      password: "admin123" // Admin requires password
     });
     
     await this.createUser({
       username: "ali",
       displayName: "Ali", 
-      role: "viewer"
+      role: "viewer",
+      password: null // Viewer doesn't need password
     });
 
     // Create sample investments
@@ -123,6 +133,20 @@ export class MemStorage implements IStorage {
     return Array.from(this.users.values());
   }
 
+  async authenticateUser(username: string, password?: string): Promise<User | null> {
+    const user = await this.getUserByUsername(username);
+    if (!user) return null;
+    
+    // Admin users require password
+    if (user.role === "admin") {
+      if (!password || user.password !== password) {
+        return null;
+      }
+    }
+    
+    return user;
+  }
+
   // Investments
   async getInvestment(id: string): Promise<Investment | undefined> {
     return this.investments.get(id);
@@ -175,6 +199,27 @@ export class MemStorage implements IStorage {
     };
     this.transactions.set(id, newTransaction);
     return newTransaction;
+  }
+
+  // Sales
+  async getSale(id: string): Promise<Sale | undefined> {
+    return this.sales.get(id);
+  }
+
+  async getAllSales(): Promise<Sale[]> {
+    return Array.from(this.sales.values())
+      .sort((a, b) => new Date(b.saleDate).getTime() - new Date(a.saleDate).getTime());
+  }
+
+  async createSale(sale: InsertSale): Promise<Sale> {
+    const id = randomUUID();
+    const newSale: Sale = { 
+      ...sale, 
+      id,
+      createdAt: new Date()
+    };
+    this.sales.set(id, newSale);
+    return newSale;
   }
 }
 

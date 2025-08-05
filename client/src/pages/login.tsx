@@ -1,30 +1,55 @@
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/components/theme-provider";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { TrendingUp, ShieldCheck, Eye, Moon, Sun } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { TrendingUp, ShieldCheck, Eye, Moon, Sun, Lock } from "lucide-react";
 
 export default function Login() {
   const { login } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { toast } = useToast();
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
 
   const loginMutation = useMutation({
-    mutationFn: async (username: string) => {
-      const response = await apiRequest("POST", "/api/auth/login", { username });
+    mutationFn: async ({ username, password }: { username: string; password?: string }) => {
+      const response = await apiRequest("POST", "/api/auth/login", { username, password });
       return response.json();
     },
     onSuccess: (user) => {
       login(user);
     },
-    onError: (error) => {
-      console.error("Login failed:", error);
+    onError: (error: any) => {
+      toast({
+        title: "Errore di accesso",
+        description: error.message || "Credenziali non valide",
+        variant: "destructive",
+      });
+      setSelectedUser(null);
+      setPassword("");
     },
   });
 
   const handleUserSelect = (username: string) => {
-    loginMutation.mutate(username);
+    if (username === "ali") {
+      // Ali doesn't need password, login directly
+      loginMutation.mutate({ username });
+    } else {
+      // Alle needs password
+      setSelectedUser(username);
+    }
+  };
+
+  const handlePasswordSubmit = () => {
+    if (selectedUser && password) {
+      loginMutation.mutate({ username: selectedUser, password });
+    }
   };
 
   return (
@@ -41,12 +66,64 @@ export default function Login() {
             Investimenti Condivisi
           </h1>
           <p className="text-gray-600 dark:text-gray-300" data-testid="text-subtitle">
-            Seleziona il tuo profilo per accedere
+            {selectedUser ? "Inserisci la password" : "Seleziona il tuo profilo per accedere"}
           </p>
         </div>
 
-        {/* User Cards */}
-        <div className="space-y-4 mb-8">
+        {/* Password Form for Admin */}
+        {selectedUser === "alle" ? (
+          <Card className="bg-white dark:bg-gray-800 p-6 border-2 border-blue-500 dark:border-blue-400 mb-8">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-lg">A</span>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Alle - Amministratore
+                </h3>
+                <p className="text-blue-600 dark:text-blue-400 font-medium flex items-center">
+                  <Lock className="w-4 h-4 mr-1" />
+                  Accesso protetto
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Inserisci la password admin"
+                  onKeyPress={(e) => e.key === "Enter" && handlePasswordSubmit()}
+                  data-testid="input-admin-password"
+                />
+              </div>
+              <div className="flex space-x-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSelectedUser(null)}
+                  className="flex-1"
+                  data-testid="button-back"
+                >
+                  Indietro
+                </Button>
+                <Button 
+                  onClick={handlePasswordSubmit}
+                  disabled={!password || loginMutation.isPending}
+                  className="flex-1"
+                  data-testid="button-login-admin"
+                >
+                  {loginMutation.isPending ? "Accesso..." : "Accedi"}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ) : (
+          /* User Cards */
+          <div className="space-y-4 mb-8">
           {/* Alle (Admin) Card */}
           <Card
             className="user-card bg-white dark:bg-gray-800 p-6 border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer"
@@ -101,6 +178,7 @@ export default function Login() {
             </div>
           </Card>
         </div>
+        )}
 
         {/* Theme Toggle */}
         <div className="flex justify-center">
